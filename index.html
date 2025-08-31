@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>TrackGuy Budget App</title>
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      overflow: hidden;
+    }
+
+    .container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: 0;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    }
+
+    .topbar {
+      height: 70px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .app-title {
+      font-family: 'Poppins', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .shape-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .circle, .square {
+      background: rgba(255, 255, 255, 0.3);
+      width: 20px;
+      height: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .circle { 
+      border-radius: 50%;
+    }
+
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 20px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .circle:hover, .square:hover, .triangle:hover {
+      transform: scale(1.1);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .main {
+      display: flex;
+      height: calc(100vh - 70px);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+      border-right: 1px solid rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      padding: 30px 0;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .nav-menu {
+      padding: 0 20px;
+    }
+
+    .nav-item {
+      display: block;
+      width: 100%;
+      padding: 18px 25px;
+      margin-bottom: 8px;
+      border: none;
+      background: transparent;
+      color: #475569;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .nav-item:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transform: translateX(5px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .content-area {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+      background: #f8fafc;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      height: 100%;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 20px;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .income-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .income-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .income-row:last-child {
+      border-bottom: none;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .income-label {
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .income-value {
+      font-weight: 600;
+      color: #059669;
+      font-size: 16px;
+    }
+
+    .edit-btn {
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .edit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .overview-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .overview-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+    }
+
+    .overview-label {
+      font-weight: 500;
+      color: #475569;
+    }
+
+    .overview-value {
+      font-weight: 700;
+      font-size: 18px;
+      color: #1e293b;
+    }
+
+    .chart-container {
+      height: 200px;
+      margin-top: 20px;
+      position: relative;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .range-select {
+      padding: 8px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      color: #475569;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .range-select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Transactions Page */
+    .transactions-container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .transactions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding: 25px 30px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .action-btn {
+      padding: 10px 20px;
+      border: 2px solid #667eea;
+      background: transparent;
+      color: #667eea;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .action-btn:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .filter-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding: 20px 30px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .filter-label {
+      font-weight: 500;
+      color: #475569;
+    }
+
+    .filter-select {
+      padding: 10px 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      background: white;
+      color: #475569;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .transactions-table-container {
+      flex: 1;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .transactions-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .transactions-table thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .transactions-table th {
+      padding: 18px 15px;
+      color: white;
+      font-weight: 600;
+      text-align: left;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .transactions-table td {
+      padding: 15px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .transactions-table tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    .transactions-table tbody tr:hover {
+      background: #f1f5f9;
+      transform: scale(1.005);
+    }
+
+    .transactions-table tr.selected {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    }
+
+    .transactions-table-wrapper {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    /* Budget Page */
+    .budget-layout {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 25px;
+      height: 100%;
+    }
+
+    .budget-overview {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 25px;
+    }
+
+    .summary-card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 30px;
+    }
+
+    .summary-item {
+      text-align: center;
+      padding: 20px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      transition: all 0.3s ease;
+    }
+
+    .summary-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .summary-label {
+      font-size: 14px;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .summary-amount {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .pie-chart-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 20px;
+    }
+
+    .budget-tables {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+    }
+
+    .budget-table-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .table-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .add-btn {
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .add-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    .budget-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .budget-table thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .budget-table th {
+      padding: 15px 12px;
+      color: white;
+      font-weight: 600;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .budget-table td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #e2e8f0;
+      color: #475569;
+    }
+
+    .budget-table tbody tr:hover {
+      background: #f1f5f9;
+    }
+
+    .budget-table input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-weight: 500;
+      color: #1e293b;
+    }
+
+    .budget-table input:focus {
+      outline: 2px solid #667eea;
+      border-radius: 4px;
+    }
+
+    /* Enhanced input styles */
+    input[type="number"] {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-weight: 500;
+      color: #1e293b;
+      transition: all 0.3s ease;
+    }
+
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    input[type="number"]:disabled {
+      background: #f8fafc;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
+      .budget-tables {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 20px 0;
+      }
+
+      .main {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .content-area {
+        padding: 20px;
+      }
+
+      .summary-card {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .budget-overview {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-menu {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        padding: 0 20px;
+      }
+
+      .nav-item {
+        text-align: center;
+        padding: 15px 10px;
+      }
+
+      .app-title {
+        font-size: 22px;
+      }
+
+      .topbar {
+        padding: 0 20px;
+      }
+    }
+
+    /* Loading animation */
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(102, 126, 234, 0.3);
+      border-radius: 50%;
+      border-top-color: #667eea;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Enhanced button animations */
+    button {
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    button:active::after {
+      width: 300px;
+      height: 300px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="topbar">
+    <div class="app-title">TrackGuy</div>
+    <div class="shape-container">
+      <div class="circle"></div>
+      <div class="square"></div>
+      <div class="triangle"></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="sidebar">
+      <div class="nav-menu">
+        <button class="nav-item active" onclick="showSection('dashboard')">
+          📊 Dashboard
+        </button>
+        <button class="nav-item" onclick="showSection('transactions')">
+          💳 Transactions
+        </button>
+        <button class="nav-item" onclick="showSection('budget')">
+          📋 Budget Planner
+        </button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <!-- DASHBOARD -->
+      <div id="dashboard" class="section active">
+        <div class="dashboard-grid">
+          <div class="card">
+            <h2 class="card-title" id="totalSalary">Monthly Income</h2>
+            <div class="income-grid">
+              <div class="income-row">
+                <span class="income-label">Paycheck</span>
+                <input type="number" value="80000" disabled class="income-value">
+              </div>
+              <div class="income-row">
+                <span class="income-label">Rent Income</span>
+                <input type="number" value="20000" disabled class="income-value">
+              </div>
+              <div class="income-row">
+                <span class="income-label">Part Time</span>
+                <input type="number" value="25000" disabled class="income-value">
+              </div>
+            </div>
+            <button id="editBtn" class="edit-btn">✏️ Edit Income</button>
+          </div>
+
+          <div class="card">
+            <h2 class="card-title">Financial Overview</h2>
+            <div class="overview-grid">
+              <div class="overview-item">
+                <span class="overview-label">💸 Total Spent</span>
+                <input type="number" id="spentInput" value="25000" disabled class="overview-value">
+              </div>
+              <div class="overview-item">
+                <span class="overview-label">💰 Remaining</span>
+                <span id="remainingDisplay" class="overview-value">₹0</span>
+              </div>
+            </div>
+            <button id="editSpentBtn" class="edit-btn">✏️ Edit Spending</button>
+            
+            <div style="margin-top: 25px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="color: #1e293b; font-weight: 600;">Monthly Expenses</h3>
+                <button id="editExpensesBtn" class="edit-btn" style="margin: 0; padding: 8px 16px; font-size: 14px;">✏️ Edit</button>
+              </div>
+              <div class="income-row">
+                <span class="income-label">👕 Clothes</span>
+                <input type="number" value="5000" disabled id="clothesInput" class="income-value">
+              </div>
+              <div class="income-row">
+                <span class="income-label">🛒 Groceries</span>
+                <input type="number" value="10000" disabled id="groceriesInput" class="income-value">
+              </div>
+              <div class="income-row" style="border-top: 2px solid #667eea; padding-top: 15px; margin-top: 15px;">
+                <strong class="income-label">Total Expenses</strong>
+                <span id="expensesTotal" class="overview-value">₹15,000</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="grid-column: 1 / -1;">
+            <div class="chart-header">
+              <h2 class="chart-title">📈 Expense Analytics</h2>
+              <select id="rangeSelect" class="range-select">
+                <option value="day">Daily View</option>
+                <option value="month">Monthly View</option>
+                <option value="year">Yearly View</option>
+              </select>
+            </div>
+            <div class="chart-container">
+              <canvas id="expenseChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRANSACTIONS -->
+      <div id="transactions" class="section">
+        <div class="transactions-container">
+          <div class="transactions-header">
+            <h2 class="page-title">💳 Transaction History</h2>
+            <div class="action-buttons">
+              <button class="action-btn" onclick="addTransaction()">➕ Add</button>
+              <button class="action-btn" onclick="editTransaction()">✏️ Edit</button>
+              <button class="action-btn" onclick="deleteTransaction()">🗑️ Delete</button>
+            </div>
+          </div>
+          
+          <div class="filter-section">
+            <span class="filter-label">🔍 Filter by Category:</span>
+            <select id="filter" class="filter-select">
+              <option value="all">All Categories</option>
+              <option value="food">🍔 Food</option>
+              <option value="transport">🚗 Transport</option>
+              <option value="utilities">⚡ Utilities</option>
+            </select>
+          </div>
+
+          <div class="transactions-table-container">
+            <div class="transactions-table-wrapper">
+              <table class="transactions-table">
+                <thead>
+                  <tr>
+                    <th>Transaction Name</th>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionsBody">
+                  <!-- Dynamic rows here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BUDGET -->
+      <div id="budget" class="section">
+        <div class="budget-layout">
+          <div class="budget-overview">
+            <div class="summary-card">
+              <div class="summary-item">
+                <div class="summary-label">💰 Total Income</div>
+                <div class="summary-amount" id="incomeValue">₹0</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">🧾 Bills Total</div>
+                <div class="summary-amount" id="billsValue">₹0</div>
+              </div>
+              <div class="summary-item">
+                <div class="summary-label">💸 Expenses Total</div>
+                <div class="summary-amount" id="expensesValue">₹0</div>
+              </div>
+            </div>
+            
+            <div class="pie-chart-card">
+              <h4 class="chart-title">💹 Budget Distribution</h4>
+              <div style="width: 150px; height: 150px; position: relative;">
+                <canvas id="budgetPie"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="budget-tables">
+            <div class="budget-table-card">
+              <div class="table-header">
+                <h3 class="table-title">🧾 Bills</h3>
+                <button class="add-btn" onclick="addBill()">➕ Add Bill</button>
+              </div>
+              <div style="overflow-y: auto; max-height: 300px;">
+                <table id="billTable" class="budget-table">
+                  <thead>
+                    <tr>
+                      <th>Due Date</th>
+                      <th>Budget</th>
+                      <th>Actual</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="budget-table-card">
+              <div class="table-header">
+                <h3 class="table-title">💸 Expenses</h3>
+                <button class="add-btn" onclick="addExpense()">➕ Add Expense</button>
+              </div>
+              <div style="overflow-y: auto; max-height: 300px;">
+                <table id="expenseTable" class="budget-table">
+                  <thead>
+                    <tr>
+                      <th>Budget</th>
+                      <th>Actual</th>
+                      <th>Remaining</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+
+  <script>
+    // Enhanced navigation with smooth transitions
+    function showSection(sectionName) {
+      // Remove active class from all sections and nav items
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      // Add active class to selected section and nav item
+      document.getElementById(sectionName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Add some interactive elements
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add ripple effect to buttons
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+          const ripple = document.createElement('span');
+          const rect = button.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const x = e.clientX - rect.left - size / 2;
+          const y = e.clientY - rect.top - size / 2;
+          
+          ripple.style.width = ripple.style.height = size + 'px';
+          ripple.style.left = x + 'px';
+          ripple.style.top = y + 'px';
+          ripple.classList.add('ripple');
+          
+          button.appendChild(ripple);
+          
+          setTimeout(() => {
+            ripple.remove();
+          }, 600);
+        });
+      });
+
+      // Add hover effects to cards
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
+
+      // Smooth scrolling for tables
+      const tableWrappers = document.querySelectorAll('.transactions-table-wrapper');
+      tableWrappers.forEach(wrapper => {
+        wrapper.style.scrollBehavior = 'smooth';
+      });
+    });
+  </script>
+
+  <style>
+    /* Additional ripple effect styling */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      transform: scale(0);
+      animation: ripple-animation 0.6s linear;
+      pointer-events: none;
+    }
+
+    @keyframes ripple-animation {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* Enhanced focus states */
+    button:focus,
+    select:focus {
+      outline: 3px solid rgba(102, 126, 234, 0.3);
+      outline-offset: 2px;
+    }
+
+    /* Improved accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Dark mode support preparation */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1e293b;
+        --bg-secondary: #334155;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+      }
+    }
+  </style>
+</body>
+</html>
