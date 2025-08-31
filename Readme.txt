@@ -18,7 +18,7 @@ A minimal and user-friendly web-based Expense Tracker built using HTML, CSS, and
 ## 📁 Files
 
 - `index.html`: Main interface and logic
-- `indexstyle.css`: Complete styling
+- `script.js`: buisness logic
 - `README.md`: You’re reading it!
 
 ---
